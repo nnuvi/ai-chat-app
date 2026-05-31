@@ -8,7 +8,7 @@ const MainLayout = () => {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="w-full h-screen flex-1 flex-col">
+      <main className="w-full h-screen flex flex-col min-h-0">
         <Navbar />
         {<Outlet />}
       </main>
