@@ -4,10 +4,12 @@ import ReactMarkdown from "react-markdown";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import vs2015 from "react-syntax-highlighter/dist/esm/styles/prism/atom-dark";
+// import atomDark from "react-syntax-highlighter/dist/esm/styles/prism/atom-dark";
 import { Textarea } from "@/components/ui/textarea";
 import { useMutation, useQuery } from "@tanstack/react-query";
 // import { getChatMessages, promptGPT } from "@/lib/api";
 import TypingLoader from "@/components/TypingLoader";
+import { getChatMessages, prompt } from "@/lib/api";
 
 export default function Homepage() {
   const location = useLocation();
@@ -27,52 +29,52 @@ export default function Homepage() {
   }, [chat_uid]);
 
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Welcome! I'm here to assist you." },
+    { role: "model", content: "Welcome! I'm here to assist you." },
   ]);
 
-  //   const mutation = useMutation({
-  //     mutationFn: promptGPT,
-  //     onSuccess: (res) => {
-  //       console.log(res);
+  const mutation = useMutation({
+    mutationFn: prompt,
+    onSuccess: (res) => {
+      console.log(res);
+      setMessages((prev) => [
+        ...prev,
+        { role: "model", content: res.reply },
+      ]);
+    },
+  });
+  // const mutation = {
+  //   isPending: false,
+  //   mutate: ({ chat_id, content }: { chat_id: string; content: string }) => {
+  //     setTimeout(() => {
   //       setMessages((prev) => [
   //         ...prev,
-  //         { role: "assistant", content: res.reply },
+  //         {
+  //           role: "assistant",
+  //           content: `Mock response to: ${content}`,
+  //         },
   //       ]);
-  //     },
-  //   });
-  const mutation = {
-    isPending: false,
-    mutate: ({ chat_id, content }: { chat_id: string; content: string }) => {
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: `Mock response to: ${content}`,
-          },
-        ]);
-      }, 500);
-    },
-  };
+  //     }, 500);
+  //   },
+  // };
 
-  //   const { data: chatData } = useQuery({
-  //     queryKey: ["chatMessages", chatID],
-  //     queryFn: () => getChatMessages(chatID),
-  //   });
-  const chatData = [
-    {
-      role: "assistant",
-      content: "# Welcome\nThis is a temporary mock chat.",
-    },
-    {
-      role: "user",
-      content: "Hello AI",
-    },
-    {
-      role: "assistant",
-      content: "Hi! How can I help you today?",
-    },
-  ];
+  const { data: chatData } = useQuery({
+    queryKey: ["chatMessages", chatID],
+    queryFn: () => getChatMessages(chatID),
+  });
+  // const chatData = [
+  //   {
+  //     role: "assistant",
+  //     content: "# Welcome\nThis is a temporary mock chat.",
+  //   },
+  //   {
+  //     role: "user",
+  //     content: "Hello AI",
+  //   },
+  //   {
+  //     role: "assistant",
+  //     content: "Hi! How can I help you today?",
+  //   },
+  // ];
 
   useEffect(() => {
     if (chatID && chatData) {
@@ -87,7 +89,7 @@ export default function Homepage() {
   useEffect(() => {
     if (location.pathname == "/" || location.pathname == "/chats/new") {
       setMessages([
-        { role: "assistant", content: "Welcome! I'm here to assist you." },
+        { role: "model", content: "Welcome! I'm here to assist you." },
       ]);
 
       // setChatID("");
